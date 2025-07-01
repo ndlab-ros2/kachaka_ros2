@@ -1,0 +1,36 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/keisoku/kachaka_sim_ws/install/kachaka_interfaces/include/**",
+        "/home/keisoku/kachaka_sim_ws/install/joy_controller/include/**",
+        "/home/keisoku/piper_ros2/install/piper_msgs/include/**",
+        "/home/keisoku/kuams3_ws/install/pointcloud_to_laserscan/include/**",
+        "/home/keisoku/kuams3_ws/install/ndt_omp_ros2/include/**",
+        "/home/keisoku/kuams3_ws/install/micro_ros_agent/include/**",
+        "/home/keisoku/kuams3_ws/install/micro_ros_msgs/include/**",
+        "/home/keisoku/kuams3_ws/install/livox_ros_driver2/include/**",
+        "/home/keisoku/ros2_ws/install/livox_ros_driver2/include/**",
+        "/home/keisoku/ros2_ws/install/crane_x7_control/include/**",
+        "/home/keisoku/uros_ws/install/micro_ros_agent/include/**",
+        "/home/keisoku/uros_ws/install/micro_ros_msgs/include/**",
+        "/opt/ros/humble/include/**",
+        "/home/keisoku/kachaka_sim_ws/src/joystick_drivers/joy/include/**",
+        "/home/keisoku/kachaka_sim_ws/src/joystick_drivers/spacenav/include/**",
+        "/home/keisoku/kachaka_sim_ws/src/joystick_drivers/wiimote/include/**",
+        "/home/keisoku/kachaka_sim_ws/src/kachaka_ros2_dev_kit/utils/joy_controller/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}
