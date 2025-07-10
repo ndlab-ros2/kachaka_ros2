@@ -35,3 +35,8 @@ docker rmi asia-northeast1-docker.pkg.dev/kachaka-api/docker/kachaka-grpc-ros2-b
 cd ~/kachaka-api/tools/ros2_bridge
 ./start_bridge.sh <kachakaのIPアドレス>
 ```
+
+マップサーバーの起動
+```bash
+ros2 run nav2_map_server map_server --ros-args -p yaml_filename:=/path/to/your/map.yaml
+```
