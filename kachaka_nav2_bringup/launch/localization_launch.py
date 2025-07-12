@@ -63,6 +63,8 @@ def generate_launch_description():
         ("/tf_static", "tf_static"),
         ("/odom", "/kachaka/wheel_odometry/wheel_odometry"),
         ("/scan", "/kachaka/lidar/scan"),
+
+        #　Whether to use the map built into kachaka
         ("/map", "/kachaka/mapping/map"),
         ("/map_updates", "/kachaka/mapping/map_updates"),
     ]
@@ -198,13 +200,13 @@ def generate_launch_description():
         ],
     )
 
-    # rviz2_node = Node(
-    #     package='rviz2',
-    #     executable='rviz2',
-    #     name='rviz2',
-    #     arguments=['-d', rviz_config_file],
-    #     parameters=[{'use_sim_time': use_sim_time}],
-    #     output='screen')
+    rviz2_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        arguments=['-d', rviz_config_file],
+        parameters=[{'use_sim_time': use_sim_time}],
+        output='screen')
 
     # Create the launch description and populate
     ld = LaunchDescription()
@@ -225,6 +227,6 @@ def generate_launch_description():
 
     # Add the actions to launch all of the localization nodes
     ld.add_action(load_nodes)
-    # ld.add_action(rviz2_node)
+    ld.add_action(rviz2_node)
 
     return ld

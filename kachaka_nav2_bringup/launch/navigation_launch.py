@@ -30,6 +30,10 @@ from nav2_common.launch import RewrittenYaml
 def generate_launch_description():
     # Get the launch directory
     bringup_dir = get_package_share_directory("kachaka_nav2_bringup")
+    emcl2_param_file = os.path.join(
+        "emcl2", 
+        "config", 
+        "emcl2.param.yaml")
 
     namespace = LaunchConfiguration("namespace")
     use_sim_time = LaunchConfiguration("use_sim_time")
@@ -37,8 +41,15 @@ def generate_launch_description():
     params_file = LaunchConfiguration("params_file")
     use_respawn = LaunchConfiguration("use_respawn")
     log_level = LaunchConfiguration("log_level")
+    map_yaml_file = LaunchConfiguration("map")
+    rviz_config_file = os.path.join(
+        bringup_dir,
+        'rviz',
+        'kachaka-nav.rviz')
 
     lifecycle_nodes = [
+        # "emcl2",
+        "map_server",
         "controller_server",
         "smoother_server",
         "planner_server",
@@ -46,6 +57,7 @@ def generate_launch_description():
         "bt_navigator",
         "waypoint_follower",
         "velocity_smoother",
+        # 'amcl',
     ]
 
     # Map fully qualified names to relative ones so the node's namespace can be prepended.
@@ -61,11 +73,16 @@ def generate_launch_description():
         ("/scan", "/kachaka/lidar/scan"),
         ("/cmd_vel", "/kachaka/manual_control/cmd_vel"),
         ("/goal_pose", "/goal_pose2"),
-        ("/map", "/kachaka/mapping/map"),
+
+        #　Whether to use the map built into kachaka
+        # ("/map", "/kachaka/mapping/map"),
     ]
 
     # Create our own temporary YAML files that include substitutions
-    param_substitutions = {"use_sim_time": use_sim_time}
+    param_substitutions = {
+        "use_sim_time": use_sim_time,
+        "yaml_filename": map_yaml_file,
+        }
 
     configured_params = RewrittenYaml(
         source_file=params_file,
@@ -110,8 +127,44 @@ def generate_launch_description():
         "log_level", default_value="info", description="log level"
     )
 
+    declare_map_yaml_file = DeclareLaunchArgument(
+        "map", 
+        description="Full path to map yaml file to load"
+    )
+
     load_nodes = GroupAction(
         actions=[
+            # Node(
+            #     package="nav2_map_server",
+            #     executable="map_server",
+            #     name="map_server",
+            #     output="screen",
+            #     parameters=[configured_params, {"yaml_filename": map_yaml_file}],
+            #     remappings=remappings,
+            #     respawn=use_respawn,
+            #     respawn_delay=2.0,
+            #     arguments=["--ros-args", "--log-level", log_level],
+            # ),
+            #ロボットの自己位置を地図上で推定するノード
+            # Node(
+            #     package='nav2_amcl',
+            #     executable='amcl',
+            #     name='amcl',
+            #     output='screen',
+            #     respawn=use_respawn,
+            #     respawn_delay=2.0,
+            #     parameters=[configured_params],
+            #     arguments=['--ros-args', '--log-level', log_level],
+            #     remappings=remappings,
+            # ),
+            # Node(
+            #     package="emcl2",
+            #     executable="emcl2_node",
+            #     name="emcl2",
+            #     output="screen",
+            #     parameters=[emcl2_param_file],
+            #     remappings=remappings,
+            #     ),
             Node(
                 package="nav2_controller",
                 executable="controller_server",
@@ -204,6 +257,14 @@ def generate_launch_description():
         ],
     )
 
+    rviz2_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        arguments=['-d', rviz_config_file],
+        parameters=[{'use_sim_time': use_sim_time}],
+        output='screen')
+
     # Create the launch description and populate
     ld = LaunchDescription()
 
@@ -217,7 +278,10 @@ def generate_launch_description():
     ld.add_action(declare_autostart_cmd)
     ld.add_action(declare_use_respawn_cmd)
     ld.add_action(declare_log_level_cmd)
+    ld.add_action(declare_map_yaml_file)
+
     # Add the actions to launch all of the navigation nodes
+    ld.add_action(rviz2_node)
     ld.add_action(load_nodes)
 
     return ld
