@@ -36,6 +36,10 @@ def generate_launch_description():
     params_file = LaunchConfiguration("params_file")
     use_respawn = LaunchConfiguration("use_respawn")
     log_level = LaunchConfiguration("log_level")
+    rviz_config_file = os.path.join(
+        bringup_dir,
+        'rviz',
+        'kachaka-nav.rviz')
 
     lifecycle_nodes = [
         "controller_server",
@@ -203,6 +207,14 @@ def generate_launch_description():
         ],
     )
 
+    rviz2_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        arguments=['-d', rviz_config_file],
+        parameters=[{'use_sim_time': use_sim_time}],
+        output='screen')
+
     # Create the launch description and populate
     ld = LaunchDescription()
 
@@ -216,7 +228,9 @@ def generate_launch_description():
     ld.add_action(declare_autostart_cmd)
     ld.add_action(declare_use_respawn_cmd)
     ld.add_action(declare_log_level_cmd)
+
     # Add the actions to launch all of the navigation nodes
+    ld.add_action(rviz2_node)
     ld.add_action(load_nodes)
 
     return ld
