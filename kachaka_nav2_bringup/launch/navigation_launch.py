@@ -19,16 +19,25 @@ from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
     GroupAction,
+    IncludeLaunchDescription,
     SetEnvironmentVariable,
 )
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import (
+    LaunchConfiguration,
+    PythonExpression,
+)
 from launch_ros.actions import Node
 from nav2_common.launch import RewrittenYaml
-
+from launch.conditions import IfCondition
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
     # Get the launch directory
     bringup_dir = get_package_share_directory("kachaka_nav2_bringup")
+    launch_dir = os.path.join(
+        bringup_dir,
+        'launch'
+    )
 
     namespace = LaunchConfiguration("namespace")
     use_sim_time = LaunchConfiguration("use_sim_time")
@@ -36,10 +45,17 @@ def generate_launch_description():
     params_file = LaunchConfiguration("params_file")
     use_respawn = LaunchConfiguration("use_respawn")
     log_level = LaunchConfiguration("log_level")
+    slam = LaunchConfiguration('slam')
+    use_composition = LaunchConfiguration('use_composition')
     rviz_config_file = os.path.join(
         bringup_dir,
         'rviz',
         'kachaka-nav.rviz')
+    
+    # use_namespace = LaunchConfiguration('use_namespace')
+
+    #　Whether to use the map built into kachaka
+    # map_yaml_file = LaunchConfiguration('map')   
 
     lifecycle_nodes = [
         "controller_server",
@@ -82,8 +98,25 @@ def generate_launch_description():
     )
 
     declare_namespace_cmd = DeclareLaunchArgument(
-        "namespace", default_value="", description="Top-level namespace"
+        "namespace", 
+        default_value="", 
+        description="Top-level namespace"
     )
+
+    declare_use_namespace_cmd = DeclareLaunchArgument(
+        'use_namespace',
+        default_value='false',
+        description='Whether to apply a namespace to the navigation stack')
+    
+    declare_slam_cmd = DeclareLaunchArgument(
+        'slam',
+        default_value='False',
+        description='Whether run a SLAM')
+    
+    #　Whether to use the map built into kachaka
+    # declare_map_yaml_cmd = DeclareLaunchArgument(
+    #     'map',
+    #     description='Full path to map yaml file to load')
 
     declare_use_sim_time_cmd = DeclareLaunchArgument(
         "use_sim_time",
@@ -103,6 +136,11 @@ def generate_launch_description():
         description="Automatically startup the nav2 stack",
     )
 
+    declare_use_composition_cmd = DeclareLaunchArgument(
+        'use_composition', 
+        default_value='false',
+        description='Whether to use composed bringup')
+
     declare_use_respawn_cmd = DeclareLaunchArgument(
         "use_respawn",
         default_value="False",
@@ -115,6 +153,19 @@ def generate_launch_description():
 
     load_nodes = GroupAction(
         actions=[
+            IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(os.path.join(launch_dir,
+                                                       'localization_launch.py')),
+            condition=IfCondition(PythonExpression(['not ', slam])),
+            launch_arguments={'namespace': namespace,
+                            #   'map': map_yaml_file,   #　Whether to use the map built into kachaka
+                              'use_sim_time': use_sim_time,
+                              'autostart': autostart,
+                              'params_file': params_file,
+                              'use_composition': use_composition,
+                              'use_respawn': use_respawn,
+                              'container_name': 'nav2_container'}.items()
+                              ),
             Node(
                 package="nav2_controller",
                 executable="controller_server",
@@ -223,9 +274,16 @@ def generate_launch_description():
 
     # Declare the launch options
     ld.add_action(declare_namespace_cmd)
+    ld.add_action(declare_use_namespace_cmd)
+    ld.add_action(declare_slam_cmd)
+
+    #　Whether to use the map built into kachaka
+    # ld.add_action(declare_map_yaml_cmd)
+    
     ld.add_action(declare_use_sim_time_cmd)
     ld.add_action(declare_params_file_cmd)
     ld.add_action(declare_autostart_cmd)
+    ld.add_action(declare_use_composition_cmd)
     ld.add_action(declare_use_respawn_cmd)
     ld.add_action(declare_log_level_cmd)
 

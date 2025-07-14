@@ -19,7 +19,8 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, GroupAction
 from launch.actions import SetEnvironmentVariable
-from launch.substitutions import LaunchConfiguration
+from launch.conditions import IfCondition
+from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import SetParameter
 from launch_ros.actions import Node
 from launch_ros.descriptions import ParameterFile
@@ -36,10 +37,20 @@ def generate_launch_description():
     params_file = LaunchConfiguration('params_file')
     use_respawn = LaunchConfiguration('use_respawn')
     log_level = LaunchConfiguration('log_level')
-    rviz_config_dir = os.path.join(kachaka_nav2_bringup_dir, 'rviz')
-    rviz_config_file = os.path.join(rviz_config_dir, 'kachaka-nav.rviz')
+    # rviz_config_file = os.path.join(
+    #     kachaka_nav2_bringup_dir,
+    #     'rviz',
+    #     'kachaka-nav.rviz')
+    
+    # autostart = LaunchConfiguration('autostart')
+    # use_composition = LaunchConfiguration('use_composition')
+    # container_name = LaunchConfiguration('container_name')
+    # container_name_full = (namespace, '/', container_name)
 
-    lifecycle_nodes = ['map_server', 'amcl']
+    lifecycle_nodes = [
+        'map_server', 
+        'amcl'
+        ]
 
     # Map fully qualified names to relative ones so the node's namespace can be prepended.
     # In case of the transforms (tf), currently, there doesn't seem to be a better alternative
@@ -56,26 +67,31 @@ def generate_launch_description():
         ("/map_updates", "/kachaka/mapping/map_updates"),
     ]
 
-    configured_params = ParameterFile(
-        RewrittenYaml(
-            source_file=params_file,
-            root_key=namespace,
-            param_rewrites={},
-            convert_types=True,
-        ),
-        allow_substs=True,
-    )
+    # Create our own temporary YAML files that include substitutions
+    param_substitutions = {"use_sim_time": use_sim_time,
+                           'yaml_filename': map_yaml_file}
 
+    configured_params = RewrittenYaml(
+        source_file=params_file,
+        root_key=namespace,
+        param_rewrites=param_substitutions,
+        convert_types=True,
+    )
+    
     stdout_linebuf_envvar = SetEnvironmentVariable(
         'RCUTILS_LOGGING_BUFFERED_STREAM', '1'
     )
 
     declare_namespace_cmd = DeclareLaunchArgument(
-        'namespace', default_value='', description='Top-level namespace'
+        'namespace', 
+        default_value='', 
+        description='Top-level namespace'
     )
 
     declare_map_yaml_cmd = DeclareLaunchArgument(
-        'map', default_value='', description='Full path to map yaml file to load'
+        'map', 
+        default_value='', 
+        description='Full path to map yaml file to load'
     )
 
     declare_use_sim_time_cmd = DeclareLaunchArgument(
@@ -86,7 +102,9 @@ def generate_launch_description():
 
     declare_params_file_cmd = DeclareLaunchArgument(
         'params_file',
-        default_value=os.path.join(kachaka_nav2_bringup_dir, 'params', 'localization_param.yaml'),
+        default_value=os.path.join(kachaka_nav2_bringup_dir, 
+                                   'params', 
+                                   'localization_param.yaml'),
         description='Full path to the ROS2 parameters file to use for all launched nodes',
     )
 
@@ -100,10 +118,52 @@ def generate_launch_description():
         'log_level', default_value='info', description='log level'
     )
 
+    declare_autostart_cmd = DeclareLaunchArgument(
+        'autostart', 
+        default_value='true',
+        description='Automatically startup the nav2 stack'
+        )
+    
+    declare_use_composition_cmd = DeclareLaunchArgument(
+        'use_composition', 
+        default_value='False',
+        description='Use composed bringup if True'
+        )
+    
+    declare_container_name_cmd = DeclareLaunchArgument(
+        'container_name', default_value='nav2_container',
+        description='the name of conatiner that nodes will load in if use composition')
+
     load_nodes = GroupAction(
         actions=[
             SetParameter('use_sim_time', use_sim_time),
             Node(
+                condition=IfCondition(
+                    PythonExpression(["'", LaunchConfiguration('map'), "' == ''"])
+                ),
+                #起動するパッケージの指定
+                package='nav2_map_server', 
+                #実行ファイルの指定
+                executable='map_server',
+                #このノードの名前の指定
+                name='map_server',
+                #ノードの出力先をterminalに指定
+                output='screen',
+                #ノードがクラッシュ・終了したときに自動再起動するかどうかの設定
+                respawn=use_respawn,
+                #ノードが終了した後、再起動するまで待つ時間の設定
+                respawn_delay=2.0,
+                #このノードに与えるパラメータの設定
+                parameters=[configured_params],
+                #ros2コマンド経由でノードに渡す追加引数の設定
+                arguments=['--ros-args', '--log-level', log_level],
+                #リマッピングの指定
+                remappings=remappings,
+            ),
+            Node(
+                condition=IfCondition(
+                    PythonExpression(["'", LaunchConfiguration('map'), "' != ''"])
+                ),
                 package='nav2_map_server',
                 executable='map_server',
                 name='map_server',
@@ -114,6 +174,7 @@ def generate_launch_description():
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings,
             ),
+            #ロボットの自己位置を地図上で推定するノード
             Node(
                 package='nav2_amcl',
                 executable='amcl',
@@ -125,6 +186,7 @@ def generate_launch_description():
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings,
             ),
+            #ライフサイクルマネージャ(map_serverやamclの状態を管理するもの)のノード
             Node(
                 package='nav2_lifecycle_manager',
                 executable='lifecycle_manager',
@@ -136,13 +198,13 @@ def generate_launch_description():
         ],
     )
 
-    rviz2_node = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='rviz2',
-        arguments=['-d', rviz_config_file],
-        parameters=[{'use_sim_time': use_sim_time}],
-        output='screen')
+    # rviz2_node = Node(
+    #     package='rviz2',
+    #     executable='rviz2',
+    #     name='rviz2',
+    #     arguments=['-d', rviz_config_file],
+    #     parameters=[{'use_sim_time': use_sim_time}],
+    #     output='screen')
 
     # Create the launch description and populate
     ld = LaunchDescription()
@@ -155,12 +217,14 @@ def generate_launch_description():
     ld.add_action(declare_map_yaml_cmd)
     ld.add_action(declare_use_sim_time_cmd)
     ld.add_action(declare_params_file_cmd)
+    ld.add_action(declare_autostart_cmd)
+    ld.add_action(declare_use_composition_cmd)
+    ld.add_action(declare_container_name_cmd)
     ld.add_action(declare_use_respawn_cmd)
     ld.add_action(declare_log_level_cmd)
 
     # Add the actions to launch all of the localization nodes
     ld.add_action(load_nodes)
-
-    ld.add_action(rviz2_node)
+    # ld.add_action(rviz2_node)
 
     return ld
