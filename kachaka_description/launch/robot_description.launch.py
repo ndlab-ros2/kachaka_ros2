@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import (
@@ -56,6 +57,25 @@ def generate_launch_description():
         ],
     )
 
+    # === 追加: RViz起動ノード ===
+    rviz_config_file = PathJoinSubstitution([
+        FindPackageShare("kachaka_description"),
+        "rviz",
+        "kachaka.rviz"  # ← 実際のファイル名に合わせて修正
+    ])
+
+    rviz_node = Node(
+        package="rviz2",
+        executable="rviz2",
+        name="rviz2",
+        arguments=["-d", rviz_config_file],
+        output="screen",
+    )
+
     return LaunchDescription(
-        [namespace_arg, frame_prefix_arg, robot_state_publisher_node]
+        [namespace_arg, 
+         frame_prefix_arg, 
+         robot_state_publisher_node,
+         rviz_node
+         ]
     )
