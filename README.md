@@ -16,10 +16,6 @@ kachaka_ros2_dev_kitは、[カチャカ](https://kachaka.life/)を用いたROS 2
 kachaka_ros2_dev_kitは、カチャカ実機、シミュレーション環境で地図生成、自己位置推定、ナビゲーションを実行する機能を提供します。
 シミュレーション環境（kachaka_gazeboパッケージ）を使ってナビゲーションを実行した例を下図に示します。
 
-|シミュレーション環境|シミュレーション環境上でのナビゲーション実行例|
-|:---:|:---:|
-|![](./docs/images/kachaka_gz_sim.png)|![](./docs/images/kachaka_gz_sim_navigation.png)|
-
 ## 動作確認環境
 
 以下の環境で動作確認しました。
