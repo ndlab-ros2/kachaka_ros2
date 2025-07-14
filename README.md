@@ -1,8 +1,8 @@
-# kachaka_ros2_dev_kit
+# kachaka_ros2
 
 ## はじめに
 
-kachaka_ros2_dev_kitは、[カチャカ](https://kachaka.life/)を用いたROS 2ソフトウェア開発キットです。以下のパッケージ群から構成されています。
+kachaka_ros2は、[カチャカ](https://kachaka.life/)を用いたROS 2ソフトウェア開発キットです。以下のパッケージ群から構成されています。
 
 |パッケージ名|説明|
 |---|---|
@@ -66,22 +66,3 @@ source ~/dev_ws/install/setup.bash
 |kachaka_mapping|Apache License, Version 2.0|
 |kachaka_gazebo|Apache License, Version 2.0|
 |utils/joy_controller|MIT|
-
-## Acknowledgment
-
-[kachaka_gazebo/worlds/eht_store.sdf](kachaka_gazebo/worlds/eht_store.sdf)はサツドラホールディングス株式会社様のご協力のもと、[EZOHUB TOKYO](https://ezohub.jp/office/tokyo/)で取得したデータを用いて作成されました。詳細は[スライド](https://www.docswell.com/s/dandelion1124/ZXE284-2025-01-07-150529)を参照ください。
-
-## コントリビューション
-
-以下のようなコントリビューションを歓迎しています。
-
-- バグ報告
-  - 本リポジトリでバグ報告のチケットを発行ください。
-- バグ修正
-  - 本リポジトリでプルリクエストを発行ください。また、どのチケットのバグを修正したものであるかを記載ください。ブランチ名にチケット番号が含まれていると対応付けがわかりやすいのでよいでしょう。
-  - 修正確認手順、結果を記載ください。
-- ドキュメント改善
-  - 誤字脱字の修正、不足している情報の追加など
-- 機能追加
-  - 本リポジトリでプルリクエストを発行ください。機能追加した背景、どのような効果があるかを説明ください。
-  - 動作確認手順、結果を記載ください。
