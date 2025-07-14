@@ -72,10 +72,21 @@ def generate_launch_description():
         output="screen",
     )
 
-    return LaunchDescription(
-        [namespace_arg, 
-         frame_prefix_arg, 
-         robot_state_publisher_node,
-         rviz_node
-         ]
+    front_camera_view_node = Node(
+        package='rqt_image_view',
+        executable='rqt_image_view',
+        name='front_camera_view',
+        arguments=['/kachaka/front_camera/image_raw/compressed'],
+        output='screen'
     )
+
+    ld = LaunchDescription()
+
+    ld.add_action(namespace_arg)
+    ld.add_action(frame_prefix_arg)
+
+    ld.add_action(robot_state_publisher_node)
+    ld.add_action(rviz_node)
+    ld.add_action(front_camera_view_node)  
+
+    return ld

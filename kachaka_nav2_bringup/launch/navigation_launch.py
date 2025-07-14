@@ -265,6 +265,14 @@ def generate_launch_description():
         arguments=['-d', rviz_config_file],
         parameters=[{'use_sim_time': use_sim_time}],
         output='screen')
+    
+    front_camera_view_node = Node(
+        package='rqt_image_view',
+        executable='rqt_image_view',
+        name='front_camera_view',
+        arguments=['/kachaka/front_camera/image_raw/compressed'],
+        output='screen'
+    )
 
     # Create the launch description and populate
     ld = LaunchDescription()
@@ -288,7 +296,8 @@ def generate_launch_description():
     ld.add_action(declare_log_level_cmd)
 
     # Add the actions to launch all of the navigation nodes
-    ld.add_action(rviz2_node)
     ld.add_action(load_nodes)
+    ld.add_action(rviz2_node)
+    ld.add_action(front_camera_view_node)  
 
     return ld

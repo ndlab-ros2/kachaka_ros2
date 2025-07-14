@@ -21,11 +21,24 @@ def generate_launch_description():
         ],
         output='screen',
     )
+
+    #Whether to launch a dedicated camera tab
+    # front_camera_view_node = Node(
+    #     package='rqt_image_view',
+    #     executable='rqt_image_view',
+    #     name='front_camera_view',
+    #     arguments=['/kachaka/front_camera/image_raw/compressed'],
+    #     output='screen'
+    # )
+
     return launch.LaunchDescription([
         joy_linux_node,
         composable_node_container,
-    ])
 
+        #Whether to launch a dedicated camera tab
+        # front_camera_view_node,
+    ]
+    )
 
 def getJoyLinuxNode():
     config_directory = os.path.join(
