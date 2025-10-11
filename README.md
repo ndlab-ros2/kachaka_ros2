@@ -1,6 +1,6 @@
 # kachaka_ROS2_package
 
-kachaka用ROS2パッケージ
+ [スマートファニチャー・プラットホーム「カチャカ」](https://kachaka.life/)ROS2用パッケージ群
 
 ## 目次
 <!-- TOC -->
@@ -21,14 +21,13 @@ kachaka用ROS2パッケージ
 
 |パッケージ名|説明|
 |---|---|
-|kachaka_description|カチャカのdescriptionを記述するパッケージ。[kachaka_description](https://github.com/pf-robotics/kachaka-api/tree/v3.8.5/ros2/kachaka_description)から派生しています。|
-|kachaka_interfaces|カチャカのアクション、メッセージファイルを管理するパッケージ。[kachaka_interfaces](https://github.com/pf-robotics/kachaka-api/tree/v3.8.5/ros2/kachaka_interfaces)から派生しています。|
-|kachaka_nav2_bringup|Nav2 stackを起動するためのパッケージ。[kachaka_nav2_bringup](https://github.com/pf-robotics/kachaka-api/tree/v3.8.5/ros2/demos/kachaka_nav2_bringup)から派生しています。|
-|kachaka_mapping|Mappingを起動するためのパッケージ|
+|kachaka_description|カチャカの各部分のリンクやジョイント、又はセンサの情報を表示するパッケージ。[kachaka_description](https://github.com/pf-robotics/kachaka-api/tree/v3.8.5/ros2/kachaka_description)に基づいています|
+|kachaka_interfaces|カチャカのアクション、メッセージファイルを管理するパッケージ。[kachaka_interfaces](https://github.com/pf-robotics/kachaka-api/tree/v3.8.5/ros2/kachaka_interfaces)に基づいています|
+|kachaka_nav2_bringup|Navigation2(Nav2)における自律走行を行うためのパッケージ。[kachaka_nav2_bringup](https://github.com/pf-robotics/kachaka-api/tree/v3.8.5/ros2/demos/kachaka_nav2_bringup)に基づいています|
 |kachaka_gazebo|Gazebo Ignitionによるカチャカのシミュレーション環境を提供するパッケージ|
-|utils/joy_controller|ユーティリティ|
+|joy_controller|お持ちのコントローラーでカチャカを操作する為のパッケージ|
 
-kachaka_ros2_dev_kitは、カチャカ実機、シミュレーション環境で地図生成、自己位置推定、ナビゲーションを実行する機能を提供します。
+こちらのリポジトリ(kachaka_ros2)では、カチャカの実機やシミュレーション開発を用いてナビゲーション等を実行する機能を提供します。
 シミュレーション環境（kachaka_gazeboパッケージ）を使ってナビゲーションを実行した例を下図に示します。
 
 |シミュレーション環境|シミュレーション環境上でのナビゲーション実行例|
@@ -37,6 +36,20 @@ kachaka_ros2_dev_kitは、カチャカ実機、シミュレーション環境で
 
 
 ## はじめに
+
+先ずは、kachaka-apiを用いてカチャカをROS2につなげる必要があります
+
+kachaka-apiのクローン作成
+```bash
+cd
+git clone https://github.com/pf-robotics/kachaka-api.git
+```
+
+kachaka-apiによる接続
+```bash
+cd ~/kachaka-api/tools/ros2_bridge
+./start_bridge.sh <kachakaのIPアドレス>
+```
 
 ビルド
 ```bash
@@ -47,12 +60,6 @@ cd ..
 rosdep install -y -i --from-paths src
 colcon build --packages-skip wiimote
 source install/setup.bash
-```
-
-kachaka-apiによる接続
-```bash
-cd ~/kachaka-api/tools/ros2_bridge
-./start_bridge.sh <kachakaのIPアドレス>
 ```
 
 ※kachakaをアップデートした際は新しいDocker環境が必要になるので、以下のコマンドを実行して既存のDocker環境を削除しなければならない
