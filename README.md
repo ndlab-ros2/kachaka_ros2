@@ -9,7 +9,6 @@
 - [はじめに](#はじめに)
 - [開発環境](#開発環境)
 - [ハードウェア](#ハードウェア)
-- [パッケージ構成](#パッケージ構成)
 - [インストール方法](#インストール方法)
 - [使用方法](#使用方法)
 
@@ -38,6 +37,33 @@
 ## はじめに
 
 先ずは、kachaka-apiを用いてカチャカをROS2につなげる必要があります
+
+### カチャカAPIの有効化
+> [!IMPORTANT]
+> どんな使い方をする場合でも、まずはじめにスマートフォンアプリを使ってカチャカAPIを有効にする必要があります。
+
+* カチャカに接続し、[⚙設定]のタブから接続するロボットを選択、[カチャカAPI]ページを開いて「カチャカAPIを有効化する」をONにします。
+* ダイアログが表示されるので、「利用規約」を確認の上、「カチャカAPI利用規約に同意する」をチェックして「設定する」を押して下さい。
+
+<table>
+<tr>
+<td><img src="./docs/images/spapp_kachaka_api_screen.png" width="150"></td>
+<td><img src="./docs/images/spapp_kachaka_api_enable_dialog.png" width="150"></td>
+</tr>
+</table>
+
+### カチャカのIPアドレスの確認
+* またいずれの場合にも、カチャカのIPアドレスが必要になります。
+* [⚙設定] > [アプリ情報] から確認することができます。(以下のキャプチャは白塗りしてあります)
+* また、mDNSによる名前解決に対応しており、同画面の「シリアル番号」からなる
+    * `kachaka-<シリアル番号>.local`というホスト名でもアクセス可能です。
+
+<table>
+<tr>
+<td><img src="./docs/images/spapp_kachaka_app_info.png" width="150"></td>
+<td><img src="./docs/images/spapp_kachaka_app_info_screen.png" width="150"></td>
+</tr>
+</table>
 
 kachaka-apiのクローン作成
 ```bash
