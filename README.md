@@ -16,7 +16,24 @@ kachaka用ROS2パッケージ
 <!-- /TOC -->
 
 ## 概要
-業務向け自律搬送ロボットの [カチャカ](https://kachaka.life/)をROS2で制御する為のリポジトリを提供します
+業務向け自律搬送ロボットの [カチャカ](https://kachaka.life/)を用いたNavigation2(Nav2)での自律移動やコントローラでの操作などのをROS2で制御する為のリポジトリを提供します。
+主に以下のパッケージで構成されています
+
+|パッケージ名|説明|
+|---|---|
+|kachaka_description|カチャカのdescriptionを記述するパッケージ。[kachaka_description](https://github.com/pf-robotics/kachaka-api/tree/v3.8.5/ros2/kachaka_description)から派生しています。|
+|kachaka_interfaces|カチャカのアクション、メッセージファイルを管理するパッケージ。[kachaka_interfaces](https://github.com/pf-robotics/kachaka-api/tree/v3.8.5/ros2/kachaka_interfaces)から派生しています。|
+|kachaka_nav2_bringup|Nav2 stackを起動するためのパッケージ。[kachaka_nav2_bringup](https://github.com/pf-robotics/kachaka-api/tree/v3.8.5/ros2/demos/kachaka_nav2_bringup)から派生しています。|
+|kachaka_mapping|Mappingを起動するためのパッケージ|
+|kachaka_gazebo|Gazebo Ignitionによるカチャカのシミュレーション環境を提供するパッケージ|
+|utils/joy_controller|ユーティリティ|
+
+kachaka_ros2_dev_kitは、カチャカ実機、シミュレーション環境で地図生成、自己位置推定、ナビゲーションを実行する機能を提供します。
+シミュレーション環境（kachaka_gazeboパッケージ）を使ってナビゲーションを実行した例を下図に示します。
+
+|シミュレーション環境|シミュレーション環境上でのナビゲーション実行例|
+|:---:|:---:|
+|![](./docs/images/kachaka_gz_sim.png)|![](./docs/images/kachaka_gz_sim_navigation.png)|
 
 
 ## はじめに
