@@ -112,6 +112,8 @@ locations:
 #### ⚠️カチャカのアップデートの際の注意点
 ※kachakaをアップデートした際はカチャカのIPアドレスが変更されるために、新しいDocker環境が必要になるので、以下のコマンドを実行して既存のDocker環境を削除しなければならない
 ```bash
+cd ~/kachaka-api/tools/ros2_bridge
+
 # 停止中コンテナの削除（必要に応じて）
 docker container prune -f
 
